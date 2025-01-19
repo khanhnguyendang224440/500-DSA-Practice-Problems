@@ -1,65 +1,65 @@
-#include <iostream> // Thu vien cho phep nhap xuat du lieu
+#include <iostream> // Thư viện cho phép nhập xuất dữ liệu
 using namespace std;
 /*
 
-#Mô tải bài toán:
+#Mô tả bài toán:
     Cho một đồ thị vô hướng có trọng số, hãy tìm Cây Khung Nhỏ Nhất (MST) của đồ thị.
-        -Cây khung (Spanning Tree):
-            +Là một cây con của đồ thị ban đầu.
-            +Bao gồm tất cả các đỉnh của đồ thị.
-            +Không chứa chu trình (cycle).
-            +Có đúng V−1 cạnh, với V là số đỉnh trong đồ thị.
-        -Cây khung nhỏ nhất (Minimum Spanning Tree):
-            +Là cây khung có tổng trọng số nhỏ nhất trong tất cả các cây khung của đồ thị.
-        -Yêu cầu:
-            +Tìm các cạnh thuộc cây khung nhỏ nhất và tính tổng trọng số của nó.
-        -Điều kiện bài toán:
-            +Đồ thị phải liên thông (có ít nhất một đường đi giữa mọi cặp đỉnh).
-            +Trọng số các cạnh không âm.
+        - Cây khung (Spanning Tree):
+            + Là một cây con của đồ thị ban đầu.
+            + Bao gồm tất cả các đỉnh của đồ thị.
+            + Không chứa chu trình (cycle).
+            + Có đúng V−1 cạnh, với V là số đỉnh trong đồ thị.
+        - Cây khung nhỏ nhất (Minimum Spanning Tree):
+            + Là cây khung có tổng trọng số nhỏ nhất trong tất cả các cây khung của đồ thị.
+        - Yêu cầu:
+            + Tìm các cạnh thuộc cây khung nhỏ nhất và tính tổng trọng số của nó.
+        - Điều kiện bài toán:
+            + Đồ thị phải liên thông (có ít nhất một đường đi giữa mọi cặp đỉnh).
+            + Trọng số các cạnh không âm.
             
 #Ý tưởng thuật toán (Kruskal):
     Thuật toán Kruskal sử dụng tư duy "Greedy" (Tham lam):
-        -Sắp xếp các cạnh theo trọng số tăng dần.
-        -Thêm các cạnh nhỏ nhất vào cây khung nhỏ nhất (MST):
-            +Lần lượt duyệt qua các cạnh đã sắp xếp.
-            +Chỉ thêm cạnh nếu nó không tạo chu trình trong cây khung hiện tại.
-        -Dừng lại khi MST có đủ V−1 cạnh.
+        - Sắp xếp các cạnh theo trọng số tăng dần.
+        - Thêm các cạnh nhỏ nhất vào cây khung nhỏ nhất (MST):
+            + Lần lượt duyệt qua các cạnh đã sắp xếp.
+            + Chỉ thêm cạnh nếu nó không tạo chu trình trong cây khung hiện tại.
+        - Dừng lại khi MST có đủ V−1 cạnh.
 */
-const int MAX = 100;        // So luong canh va dinh toi da
-const int INF = 1000000000; // Gia tri lon dai dien cho vo han
+const int MAX = 100;        // Số lượng cạnh và đỉnh tối đa
+const int INF = 1000000000; // Giá trị lớn đại diện cho vô hạn
 
-// Cau truc canh de luu thong tin cua mot canh trong do thi
+// Cấu trúc cạnh để lưu thông tin của một cạnh trong đồ thị
 struct Edge {
-    int u, v, weight; // Dinh dau, dinh cuoi, trong so
+    int u, v, weight; // Đỉnh đầu, đỉnh cuối, trọng số
 };
 
-// Ham hoan doi hai canh
+// Hàm hoán đổi hai cạnh
 void swap(Edge& a, Edge& b) {
     Edge temp = a;
     a = b;
     b = temp;
 }
 
-// Sap xep cac canh bang thuat toan sap xep noi bot (Bubble Sort)
+// Sắp xếp các cạnh bằng thuật toán sắp xếp nổi bọt (Bubble Sort)
 void bubbleSort(Edge edges[], int E) {
     for (int i = 0; i < E - 1; ++i) {
         for (int j = 0; j < E - i - 1; ++j) {
             if (edges[j].weight > edges[j + 1].weight) {
-                swap(edges[j], edges[j + 1]); // Hoan doi neu canh truoc co trong so lon hon
+                swap(edges[j], edges[j + 1]); // Hoán đổi nếu cạnh trước có trọng số lớn hơn
             }
         }
     }
 }
 
-// Ham tim goc cua mot dinh trong cay (thuoc Union-Find)
+// Hàm tìm gốc của một đỉnh trong cây (thuộc Union-Find)
 int find(int parent[], int x) {
     if (parent[x] != x) {
-        parent[x] = find(parent, parent[x]); // Path compression
+        parent[x] = find(parent, parent[x]); // Tối ưu hóa bằng Path Compression
     }
     return parent[x];
 }
 
-// Ham hop nhat hai tap hop (Union trong Union-Find)
+// Hàm hợp nhất hai tập hợp (Union trong Union-Find)
 void unionSets(int parent[], int rank[], int x, int y) {
     int rootX = find(parent, x);
     int rootY = find(parent, y);
@@ -76,59 +76,58 @@ void unionSets(int parent[], int rank[], int x, int y) {
     }
 }
 
-// Ham chinh: Thuat toan Kruskal
+// Hàm chính: Thuật toán Kruskal
 void kruskal(Edge edges[], int V, int E) {
-    bubbleSort(edges, E); // Sap xep cac canh theo trong so tang dan
+    bubbleSort(edges, E); // Sắp xếp các cạnh theo trọng số tăng dần
 
-    int parent[MAX]; // Mang cha de quan ly cac tap hop trong Union-Find
-    int rank[MAX];   // Mang cap bac de toi uu hoa Union-Find
-    Edge MST[MAX];   // Mang luu cac canh cua cay khung nho nhat
-    int mstSize = 0; // So luong canh trong cay khung nho nhat
+    int parent[MAX]; // Mảng cha để quản lý các tập hợp trong Union-Find
+    int rank[MAX];   // Mảng cấp bậc để tối ưu hóa Union-Find
+    Edge MST[MAX];   // Mảng lưu các cạnh của cây khung nhỏ nhất
+    int mstSize = 0; // Số lượng cạnh trong cây khung nhỏ nhất
 
-    // Khoi tao Union-Find
+    // Khởi tạo Union-Find
     for (int i = 0; i < V; ++i) {
-        parent[i] = i; // Moi dinh ban dau la mot tap hop rieng
-        rank[i] = 0;   // Cap bac cua moi tap hop ban dau la 0
+        parent[i] = i; // Mỗi đỉnh ban đầu là một tập hợp riêng
+        rank[i] = 0;   // Cấp bậc của mỗi tập hợp ban đầu là 0
     }
 
-    // Duyet qua tung canh
+    // Duyệt qua từng cạnh
     for (int i = 0; i < E; ++i) {
-        int u = edges[i].u;         // Dinh dau cua canh
-        int v = edges[i].v;         // Dinh cuoi cua canh
-        int weight = edges[i].weight; // Trong so cua canh
+        int u = edges[i].u;         // Đỉnh đầu của cạnh
+        int v = edges[i].v;         // Đỉnh cuối của cạnh
+        int weight = edges[i].weight; // Trọng số của cạnh
 
-        // Neu hai dinh u va v khong thuoc cung mot tap hop
+        // Nếu hai đỉnh u và v không thuộc cùng một tập hợp
         if (find(parent, u) != find(parent, v)) {
-            MST[mstSize++] = edges[i]; // Them canh vao cay khung nho nhat
-            unionSets(parent, rank, u, v); // Hop nhat hai tap hop
+            MST[mstSize++] = edges[i]; // Thêm cạnh vào cây khung nhỏ nhất
+            unionSets(parent, rank, u, v); // Hợp nhất hai tập hợp
 
-            if (mstSize == V - 1) break; // Neu cay khung da du V-1 canh thi dung lai
+            if (mstSize == V - 1) break; // Nếu cây khung đã đủ V-1 cạnh thì dừng lại
         }
     }
 
-    // In ket qua
-    cout << "Cay khung nho nhat gom cac canh:\n";
+    // In kết quả
+    cout << "Cây khung nhỏ nhất gồm các cạnh:\n";
     for (int i = 0; i < mstSize; ++i) {
         cout << MST[i].u << " - " << MST[i].v << " : " << MST[i].weight << endl;
     }
 }
 
 int main() {
-    int V, E; // So dinh va so canh
-    cout << "Nhap so dinh va so canh: ";
-    cin >> V >> E; // Nguoi dung nhap so dinh va canh
+    int V, E; // Số đỉnh và số cạnh
+    cout << "Nhập số đỉnh và số cạnh: ";
+    cin >> V >> E; // Người dùng nhập số đỉnh và cạnh
 
-    Edge edges[MAX]; // Mang luu thong tin cac canh
+    Edge edges[MAX]; // Mảng lưu thông tin các cạnh
 
-    // Nguoi dung nhap danh sach cac canh
-    cout << "Nhap cac canh (dinh u, dinh v, trong so):\n";
+    // Người dùng nhập danh sách các cạnh
+    cout << "Nhập các cạnh (đỉnh u, đỉnh v, trọng số):\n";
     for (int i = 0; i < E; ++i) {
         cin >> edges[i].u >> edges[i].v >> edges[i].weight;
     }
 
-    // Goi thuat toan Kruskal
+    // Gọi thuật toán Kruskal
     kruskal(edges, V, E);
 
-    return 0; // Ket thuc chuong trinh
+    return 0; // Kết thúc chương trình
 }
-
