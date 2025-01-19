@@ -1,7 +1,30 @@
 #include <iostream> // Thu vien cho phep nhap xuat du lieu
-
 using namespace std;
+/*
 
+#Mô tải bài toán:
+    Cho một đồ thị vô hướng có trọng số, hãy tìm Cây Khung Nhỏ Nhất (MST) của đồ thị.
+        -Cây khung (Spanning Tree):
+            +Là một cây con của đồ thị ban đầu.
+            +Bao gồm tất cả các đỉnh của đồ thị.
+            +Không chứa chu trình (cycle).
+            +Có đúng V−1 cạnh, với V là số đỉnh trong đồ thị.
+        -Cây khung nhỏ nhất (Minimum Spanning Tree):
+            +Là cây khung có tổng trọng số nhỏ nhất trong tất cả các cây khung của đồ thị.
+        -Yêu cầu:
+            +Tìm các cạnh thuộc cây khung nhỏ nhất và tính tổng trọng số của nó.
+        -Điều kiện bài toán:
+            +Đồ thị phải liên thông (có ít nhất một đường đi giữa mọi cặp đỉnh).
+            +Trọng số các cạnh không âm.
+            
+#Ý tưởng thuật toán (Kruskal):
+    Thuật toán Kruskal sử dụng tư duy "Greedy" (Tham lam):
+        -Sắp xếp các cạnh theo trọng số tăng dần.
+        -Thêm các cạnh nhỏ nhất vào cây khung nhỏ nhất (MST):
+            +Lần lượt duyệt qua các cạnh đã sắp xếp.
+            +Chỉ thêm cạnh nếu nó không tạo chu trình trong cây khung hiện tại.
+        -Dừng lại khi MST có đủ V−1 cạnh.
+*/
 const int MAX = 100;        // So luong canh va dinh toi da
 const int INF = 1000000000; // Gia tri lon dai dien cho vo han
 
